@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LumiHome – Smart Lamp System</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Orbitron:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ─── RESET & VARS ─── */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0c10;
+  --bg2:#111418;
+  --bg3:#1a1f2a;
+  --bg4:#222837;
+  --card:#161a24;
+  --card-border:rgba(255,200,80,.08);
+  --glow:#f5c842;
+  --glow2:#f0a030;
+  --glow-soft:rgba(245,200,66,.15);
+  --glow-softer:rgba(245,200,66,.06);
+  --text:#e8e0d0;
+  --text-dim:#8a8a90;
+  --accent:#f5c842;
+  --accent2:#f0a030;
+  --red:#e74c3c;
+  --green:#2ecc71;
+  --blue:#3498db;
+  --radius:14px;
+  --font:'Outfit',sans-serif;
+  --font-title:'Orbitron',sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+
+/* ─── LOGIN PAGE ─── */
+#login-page{
+  position:fixed;inset:0;z-index:1000;
+  background:var(--bg);display:flex;align-items:center;justify-content:center;
+  background-image:radial-gradient(ellipse 80% 50% at 50% 100%, rgba(245,200,66,.06) 0%, transparent 70%);
+}
+.login-box{
+  background:var(--card);border:1px solid var(--card-border);border-radius:24px;
+  padding:48px 40px;width:100%;max-width:420px;
+  box-shadow:0 0 60px rgba(245,200,66,.05);
+  animation:fadeUp .6s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo .lamp-icon{width:56px;height:56px;margin:0 auto 12px;
+  background:linear-gradient(135deg,var(--glow),var(--glow2));border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 30px rgba(245,200,66,.3);font-size:26px}
+.login-logo h1{font-family:var(--font-title);font-size:1.6rem;color:var(--glow);letter-spacing:2px}
+.login-logo p{color:var(--text-dim);font-size:.85rem;margin-top:4px}
+.role-tabs{display:flex;gap:8px;margin-bottom:28px}
+.role-tab{flex:1;padding:10px;border-radius:10px;border:1px solid var(--bg4);
+  background:var(--bg2);color:var(--text-dim);font-size:.82rem;font-weight:600;
+  cursor:pointer;text-align:center;transition:.3s;letter-spacing:.5px}
+.role-tab.active{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
+.login-field{margin-bottom:16px}
+.login-field label{font-size:.78rem;color:var(--text-dim);margin-bottom:6px;display:block;letter-spacing:.5px;text-transform:uppercase}
+.login-field input{
+  width:100%;padding:12px 16px;background:var(--bg2);border:1px solid var(--bg4);
+  border-radius:10px;color:var(--text);font-size:.9rem;font-family:var(--font);
+  transition:.3s;outline:none}
+.login-field input:focus{border-color:var(--glow);box-shadow:0 0 12px var(--glow-softer)}
+.login-btn{
+  width:100%;padding:13px;margin-top:8px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,var(--glow),var(--glow2));color:#1a1a1a;
+  font-weight:700;font-size:.92rem;cursor:pointer;letter-spacing:.5px;
+  transition:transform .2s,box-shadow .3s;font-family:var(--font)}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(245,200,66,.35)}
+.login-hint{text-align:center;margin-top:20px;font-size:.75rem;color:var(--text-dim)}
+.login-hint span{color:var(--glow);cursor:pointer}
+
+/* ─── MAIN APP ─── */
+#app{display:none;height:100vh;display:none;flex-direction:row}
+#app.visible{display:flex}
+
+/* SIDEBAR */
+.sidebar{
+  width:230px;min-width:230px;background:var(--bg2);
+  border-right:1px solid var(--card-border);
+  display:flex;flex-direction:column;height:100vh;position:relative;z-index:10;
+  transition:width .3s;overflow:hidden}
+.sidebar-header{padding:24px 20px 16px;display:flex;align-items:center;gap:10px}
+.sidebar-header .logo-circle{width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--glow),var(--glow2));
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 14px rgba(245,200,66,.3)}
+.sidebar-header .logo-text{font-family:var(--font-title);font-size:.9rem;color:var(--glow);letter-spacing:1px}
+.sidebar-header .logo-sub{font-size:.7rem;color:var(--text-dim)}
+.sidebar-nav{flex:1;padding:0 12px;overflow-y:auto}
+.nav-label{font-size:.68rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.2px;padding:12px 8px 6px;font-weight:600}
+.nav-item{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;
+  cursor:pointer;transition:.25s;color:var(--text-dim);font-size:.84rem;
+  margin-bottom:2px;position:relative}
+.nav-item:hover{background:var(--glow-softer);color:var(--text)}
+.nav-item.active{background:var(--glow-soft);color:var(--glow)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--glow);border-radius:0 3px 3px 0}
+.nav-item .nav-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.nav-item .nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.65rem;padding:2px 7px;border-radius:10px;font-weight:600}
+.sidebar-footer{padding:16px 12px;border-top:1px solid var(--card-border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:.2s}
+.user-card:hover{background:var(--bg3)}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3498db,#2980b9);
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.user-info .u-name{font-size:.82rem;font-weight:600;color:var(--text)}
+.user-info .u-role{font-size:.68rem;color:var(--glow);text-transform:uppercase;letter-spacing:.5px}
+
+/* MAIN CONTENT */
+.main{flex:1;overflow-y:auto;background:var(--bg);min-height:100vh;position:relative}
+.main-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 80% 20%, rgba(245,200,66,.04) 0%, transparent 60%),
+             radial-gradient(ellipse 50% 50% at 20% 80%, rgba(240,160,48,.03) 0%, transparent 60%)}
+.content{position:relative;z-index:1;padding:28px 32px;max-width:1200px;margin:0 auto}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.topbar h2{font-family:var(--font-title);font-size:1.1rem;color:var(--text);letter-spacing:1px}
+.topbar .topbar-right{display:flex;align-items:center;gap:14px}
+.notif-btn{width:38px;height:38px;border-radius:10px;background:var(--card);border:1px solid var(--card-border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:.2s;color:var(--text-dim);font-size:17px}
+.notif-btn:hover{border-color:var(--glow);color:var(--glow)}
+.notif-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--bg)}
+.time-badge{font-size:.78rem;color:var(--text-dim);background:var(--card);border:1px solid var(--card-border);padding:7px 14px;border-radius:10px}
+
+/* PAGES */
+.page{display:none;animation:pgFade .35s ease}
+.page.active{display:block}
+@keyframes pgFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── DASHBOARD ─── */
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;transition:.3s}
+.stat-card:hover{border-color:rgba(245,200,66,.2);transform:translateY(-2px)}
+.stat-card .sc-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.stat-card .sc-val{font-family:var(--font-title);font-size:1.6rem;color:var(--text);font-weight:700}
+.stat-card .sc-label{font-size:.75rem;color:var(--text-dim);margin-top:4px;letter-spacing:.3px}
+.stat-card .sc-trend{font-size:.7rem;margin-top:6px}
+.sc-icon.yellow{background:rgba(245,200,66,.12)}
+.sc-icon.green{background:rgba(46,204,113,.12)}
+.sc-icon.blue{background:rgba(52,152,219,.12)}
+.sc-icon.orange{background:rgba(240,160,48,.12)}
+.trend-up{color:var(--green)}
+.trend-down{color:var(--red)}
+
+.dash-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+.dash-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:22px}
+.dash-card h3{font-size:.82rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.dash-card h3 .h3-dot{width:7px;height:7px;border-radius:50%;background:var(--glow);box-shadow:0 0 6px var(--glow)}
+
+/* Chart area – Waktu Pemakaian Per Hari */
+.chart-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--text-dim);cursor:pointer;transition:.2s;user-select:none}
+.legend-item:hover{color:var(--text)}
+.legend-dot{width:10px;height:10px;border-radius:3px}
+.chart-area{height:210px;position:relative;display:flex;align-items:flex-end;gap:6px;padding:0 0 28px;border-bottom:1px solid var(--bg4)}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;position:relative}
+.chart-bar-group{display:flex;gap:2px;align-items:flex-end;height:170px;width:100%}
+.chart-bar{border-radius:3px 3px 0 0;transition:height .5s ease;position:relative;min-height:3px;flex:1}
+.chart-bar:hover{filter:brightness(1.25)}
+.chart-bar .bar-tooltip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
+  background:var(--bg2);border:1px solid var(--bg4);border-radius:6px;padding:4px 8px;
+  font-size:.62rem;color:var(--text);white-space:nowrap;z-index:5;margin-bottom:5px;pointer-events:none}
+.chart-bar:hover .bar-tooltip{display:block}
+.chart-label{font-size:.6rem;color:var(--text-dim);margin-top:6px;text-align:center}
+.chart-y-axis{position:absolute;left:-28px;top:0;bottom:28px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+.chart-y-axis span{font-size:.56rem;color:var(--bg4);text-align:right}
+
+/* Lamp list mini */
+.lamp-mini-list{display:flex;flex-direction:column;gap:10px}
+.lamp-mini{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.lamp-mini:last-child{border-bottom:none}
+.lm-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.lm-icon.on{background:rgba(245,200,66,.15);box-shadow:0 0 10px rgba(245,200,66,.2)}
+.lm-icon.off{background:var(--bg3)}
+.lm-info{flex:1}
+.lm-info .lm-name{font-size:.82rem;color:var(--text);font-weight:500}
+.lm-info .lm-room{font-size:.7rem;color:var(--text-dim)}
+.lm-status{font-size:.68rem;font-weight:600;padding:3px 9px;border-radius:6px}
+.lm-status.on{background:rgba(245,200,66,.12);color:var(--glow)}
+.lm-status.off{background:var(--bg3);color:var(--text-dim)}
+
+/* ─── CONTROL PAGE ─── */
+.control-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.control-header .filter-tabs{display:flex;gap:8px}
+.filter-tab{padding:7px 16px;border-radius:8px;border:1px solid var(--bg4);background:transparent;
+  color:var(--text-dim);font-size:.78rem;cursor:pointer;transition:.25s;font-family:var(--font)}
+.filter-tab:hover{border-color:var(--glow);color:var(--text)}
+.filter-tab.active{background:var(--glow-soft);border-color:var(--glow);color:var(--glow)}
+.master-toggle{display:flex;align-items:center;gap:10px}
+.master-toggle span{font-size:.78rem;color:var(--text-dim)}
+
+.lamp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.lamp-card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);
+  padding:22px;transition:.3s;position:relative;overflow:hidden}
+.lamp-card.on{border-color:rgba(245,200,66,.25);box-shadow:0 0 20px rgba(245,200,66,.07)}
+.lamp-card .lc-glow{position:absolute;top:-30px;right:-30px;width:100px;height:100px;
+  border-radius:50%;background:radial-gradient(circle,rgba(245,200,66,.1),transparent 70%);
+  pointer-events:none;transition:.4s;opacity:0}
+.lamp-card.on .lc-glow{opacity:1}
+.lc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.lc-lamp-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;transition:.3s}
+.lamp-card.on .lc-lamp-icon{background:rgba(245,200,66,.18);box-shadow:0 0 16px rgba(245,200,66,.25)}
+.lamp-card.off .lc-lamp-icon{background:var(--bg3)}
+.lc-info .lc-name{font-size:.9rem;font-weight:600;color:var(--text)}
+.lc-info .lc-room{font-size:.72rem;color:var(--text-dim);margin-top:2px}
+.lc-mode-badge{font-size:.65rem;padding:3px 8px;border-radius:6px;font-weight:600;letter-spacing:.3px}
+.lc-mode-badge.auto{background:rgba(52,152,219,.12);color:var(--blue)}
+.lc-mode-badge.manual{background:rgba(240,160,48,.12);color:var(--accent2)}
+
+/* Toggle switch */
+.toggle-switch{width:46px;height:26px;background:var(--bg4);border-radius:13px;position:relative;cursor:pointer;transition:.3s}
+.toggle-switch.on{background:linear-gradient(135deg,var(--glow),var(--glow2));box-shadow:0 0 10px rgba(245,200,66,.3)}
+.toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.3s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.toggle-switch.on::after{left:23px}
+
+/* Brightness slider */
+.brightness-row{margin-top:14px}
+.brightness-label{display:flex;justify-content:space-between;margin-bottom:6px}
+.brightness-label span{font-size:.72rem;color:var(--text-dim)}
+.brightness-label .b-val{color:var(--glow);font-weight:600}
+.brightness-slider{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;
+  background:var(--bg4);outline:none;cursor:pointer}
+.brightness-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--glow);cursor:pointer;box-shadow:0 0 8px rgba(245,200,66,.4);
+  transition:transform .15s}
+.brightness-slider::-webkit-slider-thumb:hover{transform:scale(1.2)}
+
+/* ─── MODE PAGE ─── */
+.mode-cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
+.mode-card{background:var(--card);border:2px solid var(--bg4);border-radius:var(--radius);padding:28px;
+  cursor:pointer;transition:.3s;position:relative;overflow:hidden}
+.mode-card:hover{border-color:var(--bg3)}
+.mode-card.selected{border-color:var(--glow);background:linear-gradient(135deg,rgba(245,200,66,.04),var(--card))}
+.mode-card.selected .mc-check{opacity:1}
+.mc-check{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;
+  background:var(--glow);display:flex;align-items:center;justify-content:center;color:#1a1a1a;
+  font-size:12px;font-weight:700;opacity:0;transition:.3s}
+.mc-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px}
+.mc-icon.auto{background:rgba(52,152,219,.12)}
+.mc-icon.manual{background:rgba(240,160,48,.12)}
+.mode-card h3{font-size:.92rem;color:var(--text);font-weight:600;margin-bottom:6px}
+.mode-card p{font-size:.76rem;color:var(--text-dim);line-height:1.5}
+
+.mode-threshold{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:22px}
+.mode-threshold h4{font-size:.78rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.threshold-row{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.threshold-label{font-size:.8rem;color:var(--text);width:120px}
+.threshold-slider{flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:var(--bg4);outline:none}
+.threshold-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--blue);cursor:pointer;box-shadow:0 0 8px rgba(52,152,219,.4)}
+.threshold-val{font-size:.78rem;color:var(--blue);font-weight:600;width:50px;text-align:right}
+
+/* ─── SENSOR PAGE ─── */
+.sensor-top{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:22px}
+.sensor-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:20px;text-align:center}
+.sensor-card .s-val{font-family:var(--font-title);font-size:1.8rem;color:var(--glow);font-weight:700}
+.sensor-card .s-unit{font-size:.7rem;color:var(--text-dim);margin-top:2px}
+.sensor-card .s-label{font-size:.72rem;color:var(--text-dim);margin-top:8px;text-transform:uppercase;letter-spacing:.5px}
+.sensor-card .s-indicator{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:.72rem}
+.s-dot{width:8px;height:8px;border-radius:50%}
+
+.sensor-chart-box{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:22px}
+.sensor-chart-box h3{font-size:.78rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.sensor-chart-box h3 .legend-inline{display:flex;gap:14px;font-size:.65rem;font-weight:400;text-transform:none;letter-spacing:0}
+.legend-inline .li-item{display:flex;align-items:center;gap:5px;color:var(--text-dim)}
+.legend-inline .li-dot{width:8px;height:8px;border-radius:50%}
+.sensor-svg-wrap{width:100%;overflow:hidden;margin-top:4px}
+.sensor-svg-wrap svg{display:block;width:100%;height:auto}
+.svg-grid-line{stroke:var(--bg4);stroke-width:.8}
+.svg-axis-label{font-family:var(--font);font-size:9px;fill:var(--text-dim)}
+.svg-line-lux{fill:none;stroke:var(--blue);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(52,152,219,.4))}
+.svg-line-threshold-on{fill:none;stroke:var(--red);stroke-width:1.2;stroke-dasharray:5 3;opacity:.7}
+.svg-line-threshold-off{fill:none;stroke:var(--green);stroke-width:1.2;stroke-dasharray:5 3;opacity:.7}
+.svg-area-lux{fill:url(#gradLux);opacity:.35}
+.svg-dot{fill:var(--blue);stroke:var(--card);stroke-width:2}
+
+/* ─── SETTINGS PAGE ─── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.settings-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:22px}
+.settings-card h3{font-size:.78rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.settings-card h3 .ico{font-size:15px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.setting-row:last-child{border-bottom:none}
+.sr-left .sr-label{font-size:.82rem;color:var(--text)}
+.sr-left .sr-desc{font-size:.7rem;color:var(--text-dim);margin-top:2px}
+.toggle-sm{width:38px;height:22px;background:var(--bg4);border-radius:11px;position:relative;cursor:pointer;transition:.3s}
+.toggle-sm.on{background:var(--glow)}
+.toggle-sm::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.3s}
+.toggle-sm.on::after{left:19px}
+.select-sm{background:var(--bg3);border:1px solid var(--bg4);color:var(--text);padding:7px 12px;border-radius:8px;font-size:.78rem;outline:none;font-family:var(--font);cursor:pointer}
+
+/* ─── ACTIVITY LOG ─── */
+.log-filters{display:flex;gap:8px;margin-bottom:18px}
+.log-list{display:flex;flex-direction:column;gap:0}
+.log-item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04);animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.log-item:last-child{border-bottom:none}
+.log-time{font-size:.68rem;color:var(--text-dim);width:58px;min-width:58px;padding-top:2px}
+.log-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;min-width:30px}
+.log-icon.on{background:rgba(245,200,66,.12)}
+.log-icon.off{background:rgba(231,76,60,.1)}
+.log-icon.mode{background:rgba(52,152,219,.12)}
+.log-icon.sensor{background:rgba(46,204,113,.12)}
+.log-body .lb-title{font-size:.8rem;color:var(--text);font-weight:500}
+.log-body .lb-desc{font-size:.7rem;color:var(--text-dim);margin-top:2px}
+
+/* ─── ADMIN PANEL ─── */
+.admin-lamp-table{width:100%;border-collapse:collapse;margin-top:12px}
+.admin-lamp-table th{text-align:left;font-size:.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;padding:10px 12px;border-bottom:1px solid var(--bg4);font-weight:600}
+.admin-lamp-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.8rem;color:var(--text)}
+.admin-lamp-table tr:hover td{background:rgba(255,255,255,.02)}
+.admin-actions{display:flex;gap:8px}
+.btn-sm{padding:5px 12px;border-radius:6px;border:none;font-size:.7rem;cursor:pointer;font-weight:600;font-family:var(--font);transition:.2s}
+.btn-edit{background:rgba(52,152,219,.15);color:var(--blue)}
+.btn-edit:hover{background:rgba(52,152,219,.25)}
+.btn-del{background:rgba(231,76,60,.12);color:var(--red)}
+.btn-del:hover{background:rgba(231,76,60,.22)}
+.btn-add{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid var(--glow);
+  background:transparent;color:var(--glow);font-size:.78rem;cursor:pointer;font-weight:600;font-family:var(--font);transition:.25s}
+.btn-add:hover{background:var(--glow-softer)}
+
+/* ─── TOAST ─── */
+.toast-container{position:fixed;top:20px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:12px 18px;
+  font-size:.78rem;color:var(--text);display:flex;align-items:center;gap:10px;
+  animation:toastIn .3s ease;box-shadow:0 4px 20px rgba(0,0,0,.3);max-width:300px}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+.toast.success .t-icon{color:var(--green)}
+.toast.info .t-icon{color:var(--blue)}
+.toast.warn .t-icon{color:var(--glow)}
+
+/* Pulse anim for live sensor dot */
+@keyframes pulseDot{
+  0%{r:5;opacity:.6}
+  100%{r:14;opacity:0}
+}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .dash-stats{grid-template-columns:repeat(2,1fr)}
+  .dash-grid{grid-template-columns:1fr}
+  .mode-cards{grid-template-columns:1fr}
+  .settings-grid{grid-template-columns:1fr}
+  .sensor-top{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .sidebar{width:70px}
+  .sidebar-header .logo-text,.sidebar-header .logo-sub,.nav-item span:not(.nav-icon),.nav-badge,.user-info{display:none}
+  .content{padding:20px 16px}
+  .dash-stats{grid-template-columns:1fr 1fr}
+  .sensor-top{grid-template-columns:1fr}
+  .lamp-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOGIN PAGE ═══════════ -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="lamp-icon">💡</div>
+      <h1>LUMIHOME</h1>
+      <p>Smart Lighting Control System</p>
+    </div>
+    <div class="role-tabs">
+      <div class="role-tab active" onclick="setRole('admin')">🛡️ Admin</div>
+      <div class="role-tab" onclick="setRole('user')">🏠 User</div>
+    </div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="login-user" placeholder="e.g. admin / homeuser" />
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••" />
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <p class="login-hint">Demo: <span onclick="fillDemo()">admin / admin123</span> atau <span onclick="fillDemoUser()">homeuser / user123</span></p>
+  </div>
+</div>
+
+<!-- ═══════════ MAIN APP ═══════════ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-circle">💡</div>
+      <div><div class="logo-text">LumiHome</div><div class="logo-sub">Smart Lamp</div></div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-label">Menu</div>
+      <div class="nav-item active" onclick="goPage('dashboard')">
+        <div class="nav-icon">📊</div><span>Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="goPage('control')">
+        <div class="nav-icon">💡</div><span>Kontrol Lampu</span>
+      </div>
+      <div class="nav-item" onclick="goPage('mode')">
+        <div class="nav-icon">⚙️</div><span>Mode</span>
+      </div>
+      <div class="nav-item" onclick="goPage('sensor')">
+        <div class="nav-icon">📡</div><span>Sensor</span>
+      </div>
+      <div class="nav-label">Lainnya</div>
+      <div class="nav-item" onclick="goPage('activity')">
+        <div class="nav-icon">📋</div><span>Aktivitas</span><span class="nav-badge" id="badge-log">3</span>
+      </div>
+      <div class="nav-item" onclick="goPage('settings')">
+        <div class="nav-icon">🔧</div><span>Pengaturan</span>
+      </div>
+      <div class="nav-item" id="nav-admin" onclick="goPage('admin')" style="display:none">
+        <div class="nav-icon">🛡️</div><span>Admin Panel</span>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" id="avatar-init">A</div>
+        <div class="user-info">
+          <div class="u-name" id="disp-name">Admin</div>
+          <div class="u-role" id="disp-role">Administrator</div>
+        </div>
+      </div>
+      <button onclick="doLogout()" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid var(--bg4);background:transparent;color:var(--text-dim);font-size:.74rem;cursor:pointer;font-family:var(--font);transition:.2s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--bg4)';this.style.color='var(--text-dim)'">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="main-bg"></div>
+    <div class="content">
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <h2 id="page-title">DASHBOARD</h2>
+        <div class="topbar-right">
+          <div class="time-badge" id="clock">--:--</div>
+          <div class="notif-btn" onclick="showToast('info','Tidak ada notifikasi baru')">🔔<div class="notif-dot"></div></div>
+        </div>
+      </div>
+
+      <!-- ─── DASHBOARD ─── -->
+      <div class="page active" id="page-dashboard">
+        <div class="dash-stats">
+          <div class="stat-card">
+            <div class="sc-icon yellow">💡</div>
+            <div class="sc-val" id="stat-total">6</div>
+            <div class="sc-label">Total Lampu</div>
+            <div class="sc-trend trend-up">↑ 1 baru ditambahkan</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-icon green">✅</div>
+            <div class="sc-val" id="stat-on">4</div>
+            <div class="sc-label">Sedang Nyala</div>
+            <div class="sc-trend trend-up">↑ 67% aktif</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-icon blue">📡</div>
+            <div class="sc-val" id="stat-lux">342</div>
+            <div class="sc-label">Lux Sensor</div>
+            <div class="sc-trend trend-down">↓ Cahaya rendah</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-icon orange">⚡</div>
+            <div class="sc-val">2.4<span style="font-size:.75rem;color:var(--text-dim)">kWh</span></div>
+            <div class="sc-label">Konsumsi Hari Ini</div>
+            <div class="sc-trend trend-up">↓ 12% dari kemarin</div>
+          </div>
+        </div>
+        <div class="dash-grid">
+          <div class="dash-card">
+            <h3><span class="h3-dot"></span>Waktu Pemakaian Per Hari (Jam)</h3>
+            <div class="chart-legend" id="chart-legend"></div>
+            <div class="chart-area" id="usage-chart" style="padding-left:30px"></div>
+          </div>
+          <div class="dash-card">
+            <h3><span class="h3-dot"></span>Status Lampu</h3>
+            <div class="lamp-mini-list" id="lamp-mini-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── KONTROL LAMPU ─── -->
+      <div class="page" id="page-control">
+        <div class="control-header">
+          <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterLamps('all',this)">Semua</button>
+            <button class="filter-tab" onclick="filterLamps('on',this)">Nyala</button>
+            <button class="filter-tab" onclick="filterLamps('off',this)">Mati</button>
+          </div>
+          <div class="master-toggle">
+            <span>Master:</span>
+            <div class="toggle-switch on" id="master-toggle" onclick="masterToggle()"></div>
+          </div>
+        </div>
+        <div class="lamp-grid" id="lamp-grid"></div>
+      </div>
+
+      <!-- ─── MODE ─── -->
+      <div class="page" id="page-mode">
+        <div class="mode-cards">
+          <div class="mode-card selected" id="mode-auto" onclick="selectMode('auto')">
+            <div class="mc-check">✓</div>
+            <div class="mc-icon auto">🤖</div>
+            <h3>Mode Otomatis</h3>
+            <p>Lampu akan menyala dan padam secara otomatis berdasarkan pembacaan sensor cahaya. Sistem akan menganalisis intensitas cahaya dan mengatur lampu sesuai kebutuhan.</p>
+          </div>
+          <div class="mode-card" id="mode-manual" onclick="selectMode('manual')">
+            <div class="mc-check">✓</div>
+            <div class="mc-icon manual">🎛️</div>
+            <h3>Mode Manual</h3>
+            <p>Anda dapat mengontrol setiap lampu secara langsung melalui toggle dan slider brightness. Sensor cahaya tidak akan mempengaruhi status lampu.</p>
+          </div>
+        </div>
+        <div class="mode-threshold">
+          <h4>⚙️ Pengaturan Ambang Batas Sensor (Auto Mode)</h4>
+          <div class="threshold-row">
+            <div class="threshold-label">Nyala Otomatis</div>
+            <input type="range" class="threshold-slider" min="0" max="1000" value="200" oninput="updateThreshold('on',this.value)"/>
+            <div class="threshold-val" id="thresh-on">200 lux</div>
+          </div>
+          <div class="threshold-row">
+            <div class="threshold-label">Padam Otomatis</div>
+            <input type="range" class="threshold-slider" min="0" max="1000" value="600" oninput="updateThreshold('off',this.value)"/>
+            <div class="threshold-val" id="thresh-off">600 lux</div>
+          </div>
+          <div class="threshold-row">
+            <div class="threshold-label">Brightness Auto</div>
+            <input type="range" class="threshold-slider" min="10" max="100" value="75" oninput="updateThreshold('bright',this.value)"/>
+            <div class="threshold-val" id="thresh-bright">75%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SENSOR ─── -->
+      <div class="page" id="page-sensor">
+        <div class="sensor-top">
+          <div class="sensor-card">
+            <div class="s-val" id="sensor-lux">342</div>
+            <div class="s-unit">LUX</div>
+            <div class="s-label">Intensitas Cahaya</div>
+            <div class="s-indicator"><span class="s-dot" style="background:var(--glow)"></span> Cahaya Sedang</div>
+          </div>
+          <div class="sensor-card">
+            <div class="s-val" style="color:var(--green)">Online</div>
+            <div class="s-unit">STATUS</div>
+            <div class="s-label">Sensor Cahaya</div>
+            <div class="s-indicator"><span class="s-dot" style="background:var(--green)"></span> Terhubung</div>
+          </div>
+          <div class="sensor-card">
+            <div class="s-val" style="color:var(--blue)" id="sensor-update">2s</div>
+            <div class="s-unit">INTERVAL</div>
+            <div class="s-label">Update Terakhir</div>
+            <div class="s-indicator"><span class="s-dot" style="background:var(--blue)"></span> Real-time</div>
+          </div>
+        </div>
+        <div class="sensor-chart-box">
+          <h3>📈 Grafik Sensor Cahaya – Lux (24 Jam)
+            <div class="legend-inline">
+              <div class="li-item"><div class="li-dot" style="background:var(--blue)"></div>Lux Aktual</div>
+              <div class="li-item"><div class="li-dot" style="background:var(--red);border-radius:0"></div>Nyala Otomatis (200)</div>
+              <div class="li-item"><div class="li-dot" style="background:var(--green);border-radius:0"></div>Padam Otomatis (600)</div>
+            </div>
+          </h3>
+          <div class="sensor-svg-wrap" id="sensor-svg-wrap"></div>
+        </div>
+      </div>
+
+      <!-- ─── AKTIVITAS ─── -->
+      <div class="page" id="page-activity">
+        <div class="log-filters">
+          <button class="filter-tab active" onclick="filterLog('all',this)">Semua</button>
+          <button class="filter-tab" onclick="filterLog('lamp',this)">💡 Lampu</button>
+          <button class="filter-tab" onclick="filterLog('mode',this)">⚙️ Mode</button>
+          <button class="filter-tab" onclick="filterLog('sensor',this)">📡 Sensor</button>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:20px">
+          <div class="log-list" id="log-list"></div>
+        </div>
+      </div>
+
+      <!-- ─── PENGATURAN ─── -->
+      <div class="page" id="page-settings">
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3><span class="ico">🏠</span> Rumah</h3>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Nama Rumah</div><div class="sr-desc">Identitas smart home Anda</div></div>
+              <input class="select-sm" type="text" value="Rumah Utama" style="width:140px"/>
+            </div>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Zona Waktu</div><div class="sr-desc">Pengaturan waktu lokal</div></div>
+              <select class="select-sm"><option>WIB (UTC+7)</option><option>WITA (UTC+8)</option><option>WIT (UTC+9)</option></select>
+            </div>
+          </div>
+          <div class="settings-card">
+            <h3><span class="ico">🔔</span> Notifikasi</h3>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Notifikasi Lampu</div><div class="sr-desc">Peringatan saat lampu menyala/padam</div></div>
+              <div class="toggle-sm on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Peringatan Sensor</div><div class="sr-desc">Alert jika sensor tidak terbaca</div></div>
+              <div class="toggle-sm on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Laporan Harian</div><div class="sr-desc">Ringkasan penggunaan setiap hari</div></div>
+              <div class="toggle-sm" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+          <div class="settings-card">
+            <h3><span class="ico">⏰</span> Jadwal</h3>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Auto On (Malam)</div><div class="sr-desc">Lampu nyala otomatis di malam hari</div></div>
+              <div class="toggle-sm on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Jam Mulai</div><div class="sr-desc">Waktu lampu nyala</div></div>
+              <input class="select-sm" type="time" value="18:00"/>
+            </div>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Jam Akhir</div><div class="sr-desc">Waktu lampu padam</div></div>
+              <input class="select-sm" type="time" value="06:00"/>
+            </div>
+          </div>
+          <div class="settings-card">
+            <h3><span class="ico">🔒</span> Keamanan</h3>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Autentikasi 2FA</div><div class="sr-desc">Verifikasi dua langkah</div></div>
+              <div class="toggle-sm" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Session Timeout</div><div class="sr-desc">Logout otomatis setelah tidak aktif</div></div>
+              <select class="select-sm"><option>30 menit</option><option>1 jam</option><option>Tidak pernah</option></select>
+            </div>
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-label">Log Aktivitas</div><div class="sr-desc">Simpan riwayat semua aktivitas</div></div>
+              <div class="toggle-sm on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ADMIN PANEL ─── -->
+      <div class="page" id="page-admin">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <div style="font-size:.8rem;color:var(--text-dim)">Kelola semua lampu dan pengguna dari sini</div>
+          <button class="btn-add" onclick="showToast('info','Fitur tambah lampu segera hadir')">＋ Tambah Lampu</button>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:20px;margin-bottom:20px">
+          <h3 style="font-size:.78rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">💡 Manajemen Lampu</h3>
+          <table class="admin-lamp-table" id="admin-table"></table>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:20px">
+          <h3 style="font-size:.78rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">👥 Manajemen Pengguna</h3>
+          <table class="admin-lamp-table">
+            <thead><tr><th>Username</th><th>Nama</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody>
+              <tr><td>admin</td><td>Administrator</td><td style="color:var(--glow)">Admin</td><td><span style="color:var(--green)">●</span> Online</td><td><div class="admin-actions"><button class="btn-sm btn-edit">Edit</button></div></td></tr>
+              <tr><td>homeuser</td><td>Pemilik Rumah</td><td style="color:var(--blue)">User</td><td><span style="color:var(--green)">●</span> Online</td><td><div class="admin-actions"><button class="btn-sm btn-edit">Edit</button><button class="btn-sm btn-del">Hapus</button></div></td></tr>
+              <tr><td>guest01</td><td>Tamu</td><td style="color:var(--text-dim)">Guest</td><td><span style="color:var(--text-dim)">●</span> Offline</td><td><div class="admin-actions"><button class="btn-sm btn-edit">Edit</button><button class="btn-sm btn-del">Hapus</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- end .content -->
+  </div><!-- end .main -->
+</div><!-- end #app -->
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ═══════════ DATA ═══════════
+let currentRole = 'admin';
+let currentMode = 'auto'; // auto | manual
+let lamps = [
+  {id:1,name:'Lampu Ruang Tamu',room:'Ruang Tamu',on:true,brightness:80,mode:'auto'},
+  {id:2,name:'Lampu Kamar Tidur',room:'Kamar Tidur',on:true,brightness:60,mode:'auto'},
+  {id:3,name:'Lampu Dapur',room:'Dapur',on:false,brightness:50,mode:'manual'},
+  {id:4,name:'Lampu Kamar Mandi',room:'Kamar Mandi',on:true,brightness:100,mode:'auto'},
+  {id:5,name:'Lampu Garasi',room:'Garasi',on:true,brightness:70,mode:'manual'},
+  {id:6,name:'Lampu Taman',room:'Taman',on:false,brightness:40,mode:'auto'},
+];
+let sensorLux = 342;
+let activityLog = [
+  {time:'18:42',type:'lamp',icon:'on',title:'Lampu Ruang Tamu Menyala',desc:'Mode otomatis — sensor cahaya < 200 lux'},
+  {time:'18:40',type:'mode',icon:'mode',title:'Mode Diganti ke Otomatis',desc:'Oleh Admin — semua lampu mengikuti sensor'},
+  {time:'18:35',type:'lamp',icon:'off',title:'Lampu Taman Padam',desc:'Mode otomatis — sensor cahaya > 600 lux'},
+  {time:'18:30',type:'sensor',icon:'sensor',title:'Sensor Cahaya Tedeteksi',desc:'Nilai lux: 342 — intensitas sedang'},
+  {time:'18:15',type:'lamp',icon:'on',title:'Lampu Kamar Tidur Menyala',desc:'Kontrol manual — brightness 60%'},
+  {time:'18:00',type:'lamp',icon:'off',title:'Lampu Dapur Padam',desc:'Kontrol manual oleh User'},
+  {time:'17:50',type:'sensor',icon:'sensor',title:'Perubahan Intensitas Cahaya',desc:'Dari 580 lux → 342 lux (menurun)'},
+  {time:'17:30',type:'lamp',icon:'on',title:'Lampu Garasi Menyala',desc:'Kontrol manual — brightness 70%'},
+];
+
+// ═══════════ LOGIN ═══════════
+function setRole(r){
+  currentRole = r;
+  document.querySelectorAll('.role-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+function fillDemo(){document.getElementById('login-user').value='admin';document.getElementById('login-pass').value='admin123'}
+function fillDemoUser(){document.getElementById('login-user').value='homeuser';document.getElementById('login-pass').value='user123'}
+function doLogin(){
+  const u=document.getElementById('login-user').value;
+  const p=document.getElementById('login-pass').value;
+  if((u==='admin'&&p==='admin123')||(u==='homeuser'&&p==='user123')){
+    currentRole = u==='admin'?'admin':'user';
+    document.getElementById('login-page').style.display='none';
+    document.getElementById('app').classList.add('visible');
+    document.getElementById('disp-name').textContent = currentRole==='admin'?'Administrator':'Pemilik Rumah';
+    document.getElementById('disp-role').textContent = currentRole==='admin'?'Administrator':'User';
+    document.getElementById('avatar-init').textContent = currentRole==='admin'?'A':'H';
+    if(currentRole==='admin') document.getElementById('nav-admin').style.display='flex';
+    renderAll();
+    showToast('success','Selamat datang di LumiHome!');
+  } else { showToast('warn','Username atau password salah'); }
+}
+function doLogout(){
+  document.getElementById('login-page').style.display='flex';
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
+}
+
+// ═══════════ NAVIGATION ═══════════
+function goPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.onclick.toString().includes(name))n.classList.add('active')});
+  const titles={dashboard:'DASHBOARD',control:'KONTROL LAMPU',mode:'PILIH MODE',sensor:'MONITORING SENSOR',activity:'LOG AKTIVITAS',settings:'PENGATURAN',admin:'ADMIN PANEL'};
+  document.getElementById('page-title').textContent = titles[name]||name;
+  if(name==='sensor') startSensorSim();
+  if(name==='activity') renderLog('all');
+  if(name==='admin') renderAdmin();
+}
+
+// ═══════════ RENDER ALL ═══════════
+function renderAll(){renderDashboard();renderControl();renderLog('all');renderAdmin()}
+
+// ─── DASHBOARD ───
+const lampColors = ['#f5c842','#f0a030','#3498db','#2ecc71','#e74c3c','#9b59b6'];
+// Jam pemakaian per lampu per hari (simulasi)
+const lampUsageHours = [
+  [3.5, 5.0, 2.0, 4.5, 6.0, 1.5], // Senin
+  [4.0, 4.5, 2.5, 5.0, 5.5, 2.0], // Selasa
+  [3.0, 5.5, 3.0, 4.0, 5.0, 1.0], // Rabu
+  [4.5, 4.0, 2.0, 5.5, 6.5, 2.5], // Kamis
+  [5.0, 5.0, 3.5, 4.5, 7.0, 3.0], // Jumat
+  [6.0, 6.5, 4.0, 5.0, 7.5, 4.0], // Sabtu
+  [5.5, 6.0, 3.5, 5.5, 7.0, 3.5], // Minggu
+];
+const dayLabels = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+
+function renderDashboard(){
+  const onCount = lamps.filter(l=>l.on).length;
+  document.getElementById('stat-total').textContent = lamps.length;
+  document.getElementById('stat-on').textContent = onCount;
+  document.getElementById('stat-lux').textContent = sensorLux;
+
+  // Legend
+  let legendHtml = '';
+  lamps.forEach((l,i)=>{
+    legendHtml += `<div class="legend-item"><div class="legend-dot" style="background:${lampColors[i]}"></div>${l.name.replace('Lampu ','')}</div>`;
+  });
+  document.getElementById('chart-legend').innerHTML = legendHtml;
+
+  // Grouped bar chart
+  const maxJam = 8;
+  const barH = 160; // max pixel height
+  let chartHtml = `<div class="chart-y-axis"><span>${maxJam}j</span><span>${maxJam*0.75}j</span><span>${maxJam*0.5}j</span><span>${maxJam*0.25}j</span><span>0</span></div>`;
+
+  dayLabels.forEach((day, di)=>{
+    chartHtml += `<div class="chart-bar-wrap">`;
+    chartHtml += `<div class="chart-bar-group">`;
+    lamps.forEach((l, li)=>{
+      const jam = lampUsageHours[di][li];
+      const h = (jam / maxJam) * barH;
+      chartHtml += `<div class="chart-bar" style="background:${lampColors[li]};height:${h}px" onmouseenter="this.querySelector('.bar-tooltip').style.display='block'" onmouseleave="this.querySelector('.bar-tooltip').style.display='none'">
+        <div class="bar-tooltip">${l.name.replace('Lampu ','')} : ${jam}j</div>
+      </div>`;
+    });
+    chartHtml += `</div>`;
+    chartHtml += `<div class="chart-label">${day}</div>`;
+    chartHtml += `</div>`;
+  });
+
+  document.getElementById('usage-chart').innerHTML = chartHtml;
+
+  // Mini list
+  let ml = '';
+  lamps.forEach(l=>{
+    ml += `<div class="lamp-mini"><div class="lm-icon ${l.on?'on':'off'}">💡</div><div class="lm-info"><div class="lm-name">${l.name}</div><div class="lm-room">${l.room} • ${l.mode==='auto'?'Auto':'Manual'}</div></div><span class="lm-status ${l.on?'on':'off'}">${l.on?'Nyala':'Mati'}</span></div>`;
+  });
+  document.getElementById('lamp-mini-list').innerHTML = ml;
+}
+
+// ─── KONTROL LAMPU ───
+let currentFilter='all';
+function filterLamps(f,el){
+  currentFilter=f;
+  document.querySelectorAll('#page-control .filter-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderControl();
+}
+function renderControl(){
+  let g='';
+  let filtered = lamps;
+  if(currentFilter==='on') filtered=lamps.filter(l=>l.on);
+  if(currentFilter==='off') filtered=lamps.filter(l=>!l.on);
+  filtered.forEach(l=>{
+    g+=`<div class="lamp-card ${l.on?'on':'off'}" id="card-${l.id}">
+      <div class="lc-glow"></div>
+      <div class="lc-top">
+        <div><div class="lc-lamp-icon">💡</div></div>
+        <div class="toggle-switch ${l.on?'on':''}" onclick="toggleLamp(${l.id})"></div>
+      </div>
+      <div class="lc-info"><div class="lc-name">${l.name}</div><div class="lc-room">${l.room}</div></div>
+      <div style="margin-top:8px"><span class="lc-mode-badge ${l.mode}">${l.mode==='auto'?'Auto':'Manual'}</span></div>
+      <div class="brightness-row">
+        <div class="brightness-label"><span>Brightness</span><span class="b-val">${l.brightness}%</span></div>
+        <input type="range" class="brightness-slider" min="5" max="100" value="${l.brightness}" oninput="changeBrightness(${l.id},this.value)" ${currentMode==='auto'&&l.mode==='auto'?'disabled':''} />
+      </div>
+    </div>`;
+  });
+  document.getElementById('lamp-grid').innerHTML=g;
+}
+function toggleLamp(id){
+  const l=lamps.find(x=>x.id===id);
+  if(currentMode==='auto'&&l.mode==='auto'){showToast('warn','Lampu ini diatur oleh mode otomatis');return}
+  l.on=!l.on;
+  activityLog.unshift({time:getTime(),type:'lamp',icon:l.on?'on':'off',title:`${l.name} ${l.on?'Menyala':'Padam'}`,desc:'Kontrol manual'});
+  renderAll();
+  showToast(l.on?'success':'info',`${l.name} ${l.on?'telah menyala':'telah padam'}`);
+}
+function changeBrightness(id,val){
+  const l=lamps.find(x=>x.id===id);
+  l.brightness=parseInt(val);
+  document.querySelector(`#card-${id} .b-val`).textContent=val+'%';
+}
+function masterToggle(){
+  const mt=document.getElementById('master-toggle');
+  const isOn=mt.classList.contains('on');
+  mt.classList.toggle('on');
+  lamps.forEach(l=>{if(l.mode==='manual')l.on=!isOn});
+  activityLog.unshift({time:getTime(),type:'lamp',icon:isOn?'off':'on',title:`Master Toggle ${isOn?'Mati':'Nyala'}`,desc:'Semua lampu manual diubah'});
+  renderAll();
+  showToast('info',`Master toggle ${isOn?'dimatikan':'dinyalakan'}`);
+}
+
+// ─── MODE ───
+function selectMode(m){
+  currentMode=m;
+  document.getElementById('mode-auto').classList.toggle('selected',m==='auto');
+  document.getElementById('mode-manual').classList.toggle('selected',m==='manual');
+  activityLog.unshift({time:getTime(),type:'mode',icon:'mode',title:`Mode Diganti ke ${m==='auto'?'Otomatis':'Manual'}`,desc:'Diubah melalui halaman Mode'});
+  renderControl();
+  showToast('info',`Mode sekarang: ${m==='auto'?'Otomatis':'Manual'}`);
+}
+function updateThreshold(type,val){
+  if(type==='on') document.getElementById('thresh-on').textContent=val+' lux';
+  if(type==='off') document.getElementById('thresh-off').textContent=val+' lux';
+  if(type==='bright') document.getElementById('thresh-bright').textContent=val+'%';
+}
+
+// ─── SENSOR ───
+let sensorInterval;
+// Full 24-hour lux data (hourly)
+const luxData24 = [
+  40,30,20,15,12,18,  // 00-05 (gelap sekali)
+  60,180,380,500,580,650, // 06-11 (pagi-siang)
+  700,680,620,560,480,350, // 12-17 (siang-sore)
+  200,120,80,60,50,42  // 18-23 (malam)
+];
+
+function startSensorSim(){
+  if(sensorInterval) clearInterval(sensorInterval);
+  renderSensorSVG();
+  sensorInterval = setInterval(()=>{
+    sensorLux += Math.floor(Math.random()*60)-30;
+    sensorLux = Math.max(50,Math.min(900,sensorLux));
+    document.getElementById('sensor-lux').textContent = sensorLux;
+    document.getElementById('stat-lux').textContent = sensorLux;
+    let label='Cahaya Sedang', color='var(--glow)';
+    if(sensorLux<200){label='Gelap';color='var(--red)'}
+    else if(sensorLux>600){label='Terang';color='var(--green)'}
+    document.querySelector('.sensor-card .s-val').style.color = color;
+    document.querySelector('.s-indicator span.s-dot').style.background = color;
+    document.querySelector('.s-indicator').lastChild.textContent = ' '+label;
+    // Update current dot position on SVG
+    const now = new Date();
+    const hr = now.getHours() + now.getMinutes()/60;
+    const W=720, padL=42, padR=14, plotW=W-padL-padR;
+    const x = padL + (hr/24)*plotW;
+    const H=220, padT=18, padB=28, plotH=H-padT-padB;
+    const maxLux=800;
+    const y = padT + plotH - (Math.min(sensorLux,maxLux)/maxLux)*plotH;
+    const dot = document.getElementById('svg-live-dot');
+    if(dot){ dot.setAttribute('cx',x); dot.setAttribute('cy',y); }
+    const val = document.getElementById('svg-live-val');
+    if(val){ val.setAttribute('x',x); val.setAttribute('y',y-8); val.textContent=sensorLux+' lux'; val.setAttribute('text-anchor',x>plotW*0.75+padL?'end':'start'); }
+  },2000);
+}
+
+function renderSensorSVG(){
+  const W=720, H=220;
+  const padL=42, padR=14, padT=18, padB=28;
+  const plotW = W-padL-padR;
+  const plotH = H-padT-padB;
+  const maxLux = 800;
+  const threshOn = 200, threshOff = 600;
+
+  // Build points string
+  function xOf(hr){ return padL + (hr/24)*plotW; }
+  function yOf(lux){ return padT + plotH - (Math.min(lux,maxLux)/maxLux)*plotH; }
+
+  let linePts = '';
+  let areaPts = `${xOf(0)},${padT+plotH} `; // start bottom-left
+  for(let i=0;i<24;i++){
+    const px = xOf(i);
+    const py = yOf(luxData24[i]);
+    linePts += `${px},${py} `;
+    areaPts += `${px},${py} `;
+  }
+  areaPts += `${xOf(23)},${padT+plotH}`; // close bottom-right
+
+  // Horizontal grid lines & Y labels
+  let gridLines = '', yLabels = '';
+  const ySteps = [0,200,400,600,800];
+  ySteps.forEach(v=>{
+    const gy = yOf(v);
+    gridLines += `<line x1="${padL}" y1="${gy}" x2="${W-padR}" y2="${gy}" class="svg-grid-line"/>`;
+    yLabels += `<text x="${padL-6}" y="${gy+3}" class="svg-axis-label" text-anchor="end">${v}</text>`;
+  });
+
+  // Vertical grid lines & X labels (every 3 hours)
+  let vGrid = '', xLabels = '';
+  for(let h=0;h<=24;h+=3){
+    const gx = xOf(h);
+    vGrid += `<line x1="${gx}" y1="${padT}" x2="${gx}" y2="${padT+plotH}" class="svg-grid-line" opacity=".5"/>`;
+    xLabels += `<text x="${gx}" y="${H-8}" class="svg-axis-label" text-anchor="middle">${String(h).padStart(2,'0')}:00</text>`;
+  }
+
+  // Threshold lines
+  const thOnY = yOf(threshOn);
+  const thOffY = yOf(threshOff);
+  const threshLines = `
+    <line x1="${padL}" y1="${thOnY}" x2="${W-padR}" y2="${thOnY}" class="svg-line-threshold-on"/>
+    <line x1="${padL}" y1="${thOffY}" x2="${W-padR}" y2="${thOffY}" class="svg-line-threshold-off"/>
+  `;
+
+  // Live dot (current hour)
+  const now = new Date();
+  const curHr = now.getHours() + now.getMinutes()/60;
+  const dotX = xOf(curHr);
+  const dotY = yOf(sensorLux);
+
+  const svg = `
+  <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gradLux" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3498db" stop-opacity=".6"/>
+        <stop offset="100%" stop-color="#3498db" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <!-- Grid -->
+    ${gridLines}
+    ${vGrid}
+    <!-- Axis labels -->
+    ${yLabels}
+    ${xLabels}
+    <text x="${padL-6}" y="${padT+plotH+padB-2}" class="svg-axis-label" text-anchor="end" opacity=".5">lux</text>
+    <!-- Threshold dashed lines -->
+    ${threshLines}
+    <!-- Area fill -->
+    <polygon points="${areaPts}" class="svg-area-lux"/>
+    <!-- Line -->
+    <polyline points="${linePts}" class="svg-line-lux"/>
+    <!-- Data dots at each hour -->
+    ${luxData24.map((v,i)=> `<circle cx="${xOf(i)}" cy="${yOf(v)}" r="2.2" class="svg-dot"/>`).join('')}
+    <!-- Live current dot (bigger, pulsing) -->
+    <circle id="svg-live-dot" cx="${dotX}" cy="${dotY}" r="5" fill="var(--blue)" stroke="var(--card)" stroke-width="2.5" style="filter:drop-shadow(0 0 5px rgba(52,152,219,.6))"/>
+    <circle id="svg-live-dot-pulse" cx="${dotX}" cy="${dotY}" r="5" fill="none" stroke="var(--blue)" stroke-width="1.5" opacity="0" style="animation:pulseDot 1.8s infinite ease-out"/>
+    <!-- Live value label -->
+    <text id="svg-live-val" x="${dotX}" y="${dotY-8}" class="svg-axis-label" text-anchor="${dotX>plotW*0.75+padL?'end':'start'}" fill="var(--blue)" font-weight="600" font-size="9.5">${sensorLux} lux</text>
+  </svg>`;
+
+  document.getElementById('sensor-svg-wrap').innerHTML = svg;
+}
+
+
+// ─── LOG ───
+function renderLog(filter){
+  let logs = filter==='all'?activityLog:activityLog.filter(l=>l.type===filter);
+  let html='';
+  logs.forEach(l=>{
+    html+=`<div class="log-item"><div class="log-time">${l.time}</div><div class="log-icon ${l.icon}">${l.icon==='on'?'💡':l.icon==='off'?'🌑':l.icon==='mode'?'⚙️':'📡'}</div><div class="log-body"><div class="lb-title">${l.title}</div><div class="lb-desc">${l.desc}</div></div></div>`;
+  });
+  document.getElementById('log-list').innerHTML=html;
+}
+function filterLog(f,el){
+  document.querySelectorAll('#page-activity .filter-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderLog(f);
+}
+
+// ─── ADMIN ───
+function renderAdmin(){
+  let html=`<thead><tr><th>ID</th><th>Nama Lampu</th><th>Ruangan</th><th>Status</th><th>Mode</th><th>Brightness</th><th>Aksi</th></tr></thead><tbody>`;
+  lamps.forEach(l=>{
+    html+=`<tr><td>#${l.id}</td><td>💡 ${l.name}</td><td>${l.room}</td><td>${l.on?'<span style="color:var(--green)">● Nyala</span>':'<span style="color:var(--red)">● Mati</span>'}</td><td>${l.mode==='auto'?'<span style="color:var(--blue)">Auto</span>':'<span style="color:var(--accent2)">Manual</span>'}</td><td>${l.brightness}%</td><td><div class="admin-actions"><button class="btn-sm btn-edit" onclick="showToast('info','Edit ${l.name}')">Edit</button><button class="btn-sm btn-del" onclick="showToast('warn','Konfirmasi hapus')">Hapus</button></div></td></tr>`;
+  });
+  html+='</tbody>';
+  document.getElementById('admin-table').innerHTML=html;
+}
+
+// ═══════════ TOAST ═══════════
+function showToast(type,msg){
+  const c=document.getElementById('toast-container');
+  const icons={success:'✓',info:'ℹ',warn:'⚠'};
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span class="t-icon">${icons[type]}</span>${msg}`;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(),2800);
+}
+
+// ═══════════ CLOCK ═══════════
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock,1000);
+updateClock();
+
+function getTime(){
+  const now=new Date();
+  return now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+}
+
+// ═══════════ BADGE UPDATE ═══════════
+setInterval(()=>{
+  document.getElementById('badge-log').textContent=activityLog.length>9?'9+':activityLog.length;
+},1500);
+</script>
+</body>
+</html>
