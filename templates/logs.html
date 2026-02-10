@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Activity Logs</title>
+</head>
+<body>
+    <h2>Activity Logs</h2>
+    <a href="/dashboard">Kembali ke Dashboard</a>
+    <hr>
+
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Lamp</th>
+            <th>Action</th>
+            <th>Description</th>
+            <th>IP</th>
+            <th>Time</th>
+        </tr>
+
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.log_id }}</td>
+            <td>{{ log.username }}</td>
+            <td>{{ log.lamp_name }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.description }}</td>
+            <td>{{ log.ip_address }}</td>
+            <td>{{ log.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

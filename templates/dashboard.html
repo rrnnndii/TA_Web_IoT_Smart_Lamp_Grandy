@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Smart Lamp</title>
+</head>
+<body>
+    <h2>Dashboard Smart Lamp</h2>
+
+    <p>Login sebagai: <b>{{ user.username }}</b> ({{ user.role }})</p>
+    <a href="/logout">Logout</a>
+{% if user.role == "ADMIN" %}
+    <a href="/logs">Lihat Log History</a>
+{% endif %}
+
+    <hr>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h3>Daftar Lampu</h3>
+
+    {% for lamp in lamps %}
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            <h4>{{ lamp.lamp_name }} (ID: {{ lamp.lamp_id }})</h4>
+            <p>Lokasi: {{ lamp.location }}</p>
+            <p>Mode: <b>{{ lamp.mode }}</b></p>
+            <p>Status Relay: <b>{{ lamp.relay_state }}</b></p>
+            <p>Manual Command: <b>{{ lamp.manual_command }}</b></p>
+        {% if user.role in ["ADMIN", "USER"] %}
+            <form method="POST" action="/lamp/{{ lamp.lamp_id }}/set-mode">
+                <label>Ubah Mode:</label>
+                <select name="mode">
+                    <option value="AUTO" {% if lamp.mode == 'AUTO' %}selected{% endif %}>AUTO</option>
+                    <option value="MANUAL" {% if lamp.mode == 'MANUAL' %}selected{% endif %}>MANUAL</option>
+                </select>
+                <button type="submit">Simpan</button>
+            </form>
+
+            <br>
+            <form method="POST" action="/lamp/{{ lamp.lamp_id }}/manual">
+                <button type="submit" name="command" value="ON">ON</button>
+                <button type="submit" name="command" value="OFF">OFF</button>
+            </form>
+
+            <p style="font-size:12px; color:gray;">
+                Terakhir update: {{ lamp.updated_at }}
+            </p>
+        </div>
+        {% else %}
+            <p><i>Guest hanya bisa melihat status.</i></p>
+        {% endif %}
+    {% endfor %}
+        
+</body>
+</html>

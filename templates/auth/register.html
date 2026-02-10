@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register Smart Lamp</title>
+</head>
+<body>
+    <h2>Register Smart Lamp</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <p style="color:red;">{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <label>Nama Asli</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label>Username</label><br>
+        <input type="text" name="username" required><br><br>
+
+        <label>Password</label><br>
+        <input type="password" name="password" required><br><br>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <br>
+    <a href="/login">Sudah punya akun? Login</a>
+</body>
+</html>
